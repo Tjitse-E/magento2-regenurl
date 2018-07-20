@@ -98,12 +98,14 @@ class FixCategoryTreeCommand extends Command
         $this->setName('regenerate:category:tree')
             ->setDescription('Regenerate the category tree for a given category tree')
             ->addOption(
-                'category', 'c',
+                'category',
+                'c',
                 InputOption::VALUE_REQUIRED,
                 'Products to regenerate'
             )
             ->addOption(
-                'store', 's',
+                'store',
+                's',
                 InputOption::VALUE_REQUIRED,
                 'Use the specific Store View',
                 Store::DEFAULT_STORE_ID
@@ -124,7 +126,7 @@ class FixCategoryTreeCommand extends Command
         // Get categorie and store
         try {
             $category = $this->categoryRepository->get($categoryId);
-        } catch ( \Magento\Framework\Exception\NoSuchEntityException $exception) {
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
             $output->writeln("<error>Category: {$exception->getMessage()}</error>");
             return;
         }
@@ -140,7 +142,7 @@ class FixCategoryTreeCommand extends Command
 
         // Check descendants
         $descendants = $this->getDescendants($category, $storeId);
-        if(!$descendants) {
+        if (!$descendants) {
             $output->writeln("<error>No descendants found for {$category->getName()}</error>");
             return;
         }
@@ -163,7 +165,7 @@ class FixCategoryTreeCommand extends Command
         $output->writeln("<info>Starting url regeneration</info>");
         $this->getApplication()->find('regenerate:category:url')->run($arguments, $output);
 
-        $output->writeln('Finshed!');
+        $output->writeln('<info>Finshed!</info>');
     }
 
     /**
@@ -182,7 +184,7 @@ class FixCategoryTreeCommand extends Command
             ->addLevelFilter($category->getLevel() + $levels)
             ->setStore($storeId);
 
-        if($collection->count() === 0) {
+        if ($collection->count() === 0) {
             return false;
         }
 
