@@ -16,6 +16,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -153,63 +154,16 @@ class FixCategoryTreeCommand extends Command
         // Delete old redirects
         $this->deleteUrlRewriteRecords($output, $categoryIds, $store);
 
-        // Convert categories inculding parent into array
-        $categories = [];
-        array_push($categories, $category);
-        foreach($descendants->getItems() as $descendant) {
-            array_push($categories, $descendant);
-        }
+        // Acivate RegenerateCategoryPathCommand
+        $output->writeln("<info>Starting path regeneration</info>");
+        $arguments = new ArrayInput(['cids' => $categoryIds, '--store' => $storeId]);
+        $this->getApplication()->find('regenerate:category:path')->run($arguments, $output);
 
-        // Set area code
-        try{
-            $this->state->getAreaCode();
-        }catch ( \Magento\Framework\Exception\LocalizedException $e){
-            $this->state->setAreaCode('adminhtml');
-        }
+        // Activate RegenerateCategoryUrlCommand
+        $output->writeln("<info>Starting url regeneration</info>");
+        $this->getApplication()->find('regenerate:category:url')->run($arguments, $output);
 
-        // Now starting regenerating the category paths
-        $regenerated = 0;
-        foreach($categories as $category)
-        {
-            $output->writeln('Regenerating urls for ' . $category->getName() . ' (' . $category->getId() . ')');
-
-            $category->setOrigData('url_key', mt_rand(0,1000)); // set url_key in orig data to random value to force regeneration of path
-            $category->setOrigData('url_path', mt_rand(0,1000)); // set url_path in orig data to random value to force regeneration of path for children
-
-            // Make use of Magento's event for this
-            $this->emulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
-            $this->eventManager->dispatch('regenerate_category_url_path', ['category' => $category]);
-            $this->emulation->stopEnvironmentEmulation();
-
-            $regenerated++;
-        }
-        $output->writeln("<info>Done regenerating. Regenerated url paths for {$regenerated} categories</info>");
-
-        // Now starting regenerating the category urls
-        $this->emulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
-        $regenerated = 0;
-        foreach($categories as $category)
-        {
-            $output->writeln("<info>Regenerating urls for {$category->getName()} ({$category->getId()}</info>");
-
-            $this->urlPersist->deleteByData([
-                                                UrlRewrite::ENTITY_ID => $category->getId(),
-                                                UrlRewrite::ENTITY_TYPE => CategoryUrlRewriteGenerator::ENTITY_TYPE,
-                                                UrlRewrite::REDIRECT_TYPE => 0,
-                                                UrlRewrite::STORE_ID => $storeId
-                                            ]);
-
-            $newUrls = $this->categoryUrlRewriteGenerator->generate($category);
-            try {
-                $this->urlPersist->replace($newUrls);
-                $regenerated += count($newUrls);
-            }
-            catch(\Exception $e) {
-                $output->writeln(sprintf('<error>Duplicated url for store ID %d, category %d (%s) - %s Generated URLs:' . PHP_EOL . '%s</error>' . PHP_EOL, $storeId, $category->getId(), $category->getName(), $e->getMessage(), implode(PHP_EOL, array_keys($newUrls))));
-            }
-        }
-        $this->emulation->stopEnvironmentEmulation();
-        $output->writeln("<info>Done regenerating. Regenerated {$regenerated} urls</info>");
+        $output->writeln('Finshed!');
     }
 
     /**
