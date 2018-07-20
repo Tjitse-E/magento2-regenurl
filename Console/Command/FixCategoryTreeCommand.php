@@ -101,13 +101,13 @@ class FixCategoryTreeCommand extends Command
                 'category',
                 'c',
                 InputOption::VALUE_REQUIRED,
-                'Products to regenerate'
+                'Category tree to regenerate (parent category including its children)'
             )
             ->addOption(
                 'store',
                 's',
                 InputOption::VALUE_REQUIRED,
-                'Use the specific Store View',
+                'Magento Store ID',
                 Store::DEFAULT_STORE_ID
             );
         return parent::configure();
