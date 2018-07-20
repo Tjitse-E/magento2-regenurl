@@ -11,7 +11,6 @@ namespace Iazel\RegenProductUrl\Console\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,7 +22,6 @@ use Magento\UrlRewrite\Model\UrlPersistInterface;
 use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
-use Magento\Framework\App\Area;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -105,6 +103,19 @@ class FixCategoryTreeCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Magento Store ID',
                 Store::DEFAULT_STORE_ID
+            )->addOption(
+                'reindex',
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'Reindex after completion?',
+                true
+            )
+            ->addOption(
+                'flush',
+                'flush',
+                InputOption::VALUE_OPTIONAL,
+                'Cache flush after completion?',
+                true
             );
         return parent::configure();
     }
@@ -162,6 +173,10 @@ class FixCategoryTreeCommand extends Command
         // Activate RegenerateCategoryUrlCommand
         $output->writeln("<info>3. Starting url regeneration. Executing 'regenerate:category:url'</info>");
         $this->getApplication()->find('regenerate:category:url')->run($arguments, $output);
+
+        // Optional cache clean and reindex
+        $this->reindex($input, $output);
+        $this->cacheFlush($input, $output);
 
         $output->writeln('<info>Finshed!</info>');
     }
@@ -238,5 +253,45 @@ class FixCategoryTreeCommand extends Command
         $sql = "DELETE FROM `url_rewrite` WHERE `entity_id` IN ({$categoryIdsString}) AND `entity_type` = 'category' AND `store_id` = {$store->getId()}";
         $output->writeln($sql);
         $connection->query($sql);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return ArrayInput
+     */
+    protected function reindex(InputInterface $input, OutputInterface $output): ArrayInput
+    {
+        if ($input->getOption('reindex')) {
+            $output->writeln('<info>Starting reindex</info>');
+
+            $arguments = new ArrayInput(
+                [
+                    'command' => 'index:reindex',
+                    'index' => [
+                        'catalog_product_flat',
+                        'catalog_category_flat',
+                        'catalog_category_product',
+                        'catalog_product_category',
+                        'catalog_product_attribute'
+                    ]
+                ]
+            );
+            $this->getApplication()->find('index:reindex')->run($arguments, $output);
+        }
+        return $arguments;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function cacheFlush(InputInterface $input, OutputInterface $output): void
+    {
+        if ($input->getOption('flush')) {
+            $output->writeln('<info>Starting cache clean</info>');
+            $arguments = new ArrayInput(['command' => 'cache:flush']);
+            $this->getApplication()->find('cache:flush')->run($arguments, $output);
+        }
     }
 }
