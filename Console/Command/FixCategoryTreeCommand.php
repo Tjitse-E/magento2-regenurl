@@ -108,14 +108,14 @@ class FixCategoryTreeCommand extends Command
                 'r',
                 InputOption::VALUE_OPTIONAL,
                 'Reindex after completion?',
-                true
+                false
             )
             ->addOption(
                 'flush',
-                'flush',
+                'f',
                 InputOption::VALUE_OPTIONAL,
                 'Cache flush after completion?',
-                true
+                false
             );
         return parent::configure();
     }
@@ -260,7 +260,7 @@ class FixCategoryTreeCommand extends Command
      * @param OutputInterface $output
      * @return ArrayInput
      */
-    protected function reindex(InputInterface $input, OutputInterface $output): ArrayInput
+    protected function reindex(InputInterface $input, OutputInterface $output): void
     {
         if ($input->getOption('reindex')) {
             $output->writeln('<info>Starting reindex</info>');
@@ -279,7 +279,6 @@ class FixCategoryTreeCommand extends Command
             );
             $this->getApplication()->find('index:reindex')->run($arguments, $output);
         }
-        return $arguments;
     }
 
     /**
