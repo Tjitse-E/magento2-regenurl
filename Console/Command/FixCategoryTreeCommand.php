@@ -8,12 +8,6 @@ declare(strict_types=1);
 
 namespace Iazel\RegenProductUrl\Console\Command;
 
-use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Catalog\Api\Data\CategoryInterface;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
-use Magento\Framework\App\Area;
-use Magento\Framework\App\ResourceConnection;
-use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -22,14 +16,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Store\Model\Store;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Magento\Store\Model\App\Emulation;
 use Magento\Framework\EntityManager\EventManager;
 use Magento\Framework\App\State;
 use Magento\UrlRewrite\Model\UrlPersistInterface;
-use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
-use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
 use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Store\Model\StoreManagerInterface;
 
 class FixCategoryTreeCommand extends Command
 {
@@ -154,15 +150,17 @@ class FixCategoryTreeCommand extends Command
         $categoryIds = $this->getAllCategoryIds($category, $descendants);
 
         // Delete old redirects
+        $categoryIdsString = implode(', ', $categoryIds);
+        $output->writeln("<info>1. Deleting old redirects for {$categoryIdsString}. SQL query:</info>");
         $this->deleteUrlRewriteRecords($output, $categoryIds, $store);
 
         // Acivate RegenerateCategoryPathCommand
-        $output->writeln("<info>Starting path regeneration</info>");
+        $output->writeln("<info>2. Starting path regeneration. Executing 'regenerate:category:path'</info>");
         $arguments = new ArrayInput(['cids' => $categoryIds, '--store' => $storeId]);
         $this->getApplication()->find('regenerate:category:path')->run($arguments, $output);
 
         // Activate RegenerateCategoryUrlCommand
-        $output->writeln("<info>Starting url regeneration</info>");
+        $output->writeln("<info>3. Starting url regeneration. Executing 'regenerate:category:url'</info>");
         $this->getApplication()->find('regenerate:category:url')->run($arguments, $output);
 
         $output->writeln('<info>Finshed!</info>');
@@ -180,7 +178,7 @@ class FixCategoryTreeCommand extends Command
         }
         $collection = $this->categoryCollectionFactory->create()
             ->addAttributeToSelect(['name', 'url_key'])
-            ->addPathsFilter($category->getPath().'/')
+            ->addPathsFilter($category->getPath() . '/')
             ->addLevelFilter($category->getLevel() + $levels)
             ->setStore($storeId);
 
@@ -238,8 +236,7 @@ class FixCategoryTreeCommand extends Command
         $connection = $this->connection->getConnection();
         $categoryIdsString = implode(', ', $categoryIds);
         $sql = "DELETE FROM `url_rewrite` WHERE `entity_id` IN ({$categoryIdsString}) AND `entity_type` = 'category' AND `store_id` = {$store->getId()}";
-        $output->writeln("Sql query:");
-        $output->writeln("<debug>{$sql}</debug>");
+        $output->writeln($sql);
         $connection->query($sql);
     }
 }
