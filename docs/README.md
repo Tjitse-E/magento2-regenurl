@@ -2,6 +2,8 @@
 
 This fork of [peterjaap/magento2-regenurl](https://github.com/peterjaap/magento2-regenurl) adds a command to fix broken category urls on Magento 2.2.x. You can find more info about the issue here: [#16202](https://github.com/magento/magento2/issues/16202)
 
+**We've used this solution once, on one of our Magento stores running Magento 2.2.4, with over 30 store views using four languages. Never try this on production without testing!**
+
 ## The problem
 
 When you're running a Magento 2.2 store with multiple store views, let's say three stores in different languages (Dutch, French and German), sometimes the category urls will start to deform like this:.
@@ -37,7 +39,7 @@ Before:
 ![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/wrong-urls.png)
 
 After:
-![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/wrong-urls.png)
+![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/fixed-urls.png)
 
 # Install
 Using Composer;
