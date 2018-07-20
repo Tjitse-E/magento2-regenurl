@@ -36,15 +36,15 @@ In our case it didn't work to regenerate one of the deepest level subcategories.
 
 Output:
 
-![Output screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/console-screenshot.jpg)
+![Output screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/console-screenshot.jpg)
 
 Before:
 
-![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/wrong-urls.png)
+![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/wrong-urls.png)
 
 After:
 
-![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/fixed-urls.png)
+![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/fixed-urls.png)
 
 # Install
 Using Composer;
