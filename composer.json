@@ -15,7 +15,7 @@
   ],
   "autoload": {
     "files": [
-      "Iazel/RegenProductUrl/registration.php"
+      "registration.php"
     ],
     "psr-4": {
       "Iazel\\RegenProductUrl\\": "Iazel/RegenProductUrl"
