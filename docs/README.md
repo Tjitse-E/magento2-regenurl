@@ -40,11 +40,11 @@ Output:
 
 Before:
 
-![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/wrong-urls.png)
+![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/wrong-urls2.png)
 
 After:
 
-![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/fixed-urls.png)
+![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/fixed-urls2.png)
 
 # Install
 Using Composer;
