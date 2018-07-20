@@ -32,13 +32,18 @@ I've created a command that will do this for you automatically:
 
 `php bin/magento regenerate:category:tree --category categoryId --store storeId`
 
+In our case it didn't work to regenerate one of the deepest level subcategories. We had to use one of the top level categories to make this work. The command will automatically fix the parent and the child categories.
+
 Output:
+
 ![Output screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/console-screenshot.jpg)
 
 Before:
+
 ![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/wrong-urls.png)
 
 After:
+
 ![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/fixed-urls.png)
 
 # Install
