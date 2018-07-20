@@ -1,4 +1,4 @@
-### Fix broken multistore category urls
+# Magento 2 - Fix broken multistore category urls
 
 This fork of [peterjaap/magento2-regenurl](https://github.com/peterjaap/magento2-regenurl) adds a command to fix broken category urls on Magento 2.2.x. You can find more info about the issue here: [#16202](https://github.com/magento/magento2/issues/16202)
 
@@ -31,13 +31,13 @@ I've created a command that will do this for you automatically:
 `php bin/magento regenerate:category:tree --category categoryId --store storeId`
 
 Output:
-Screenshot
+![Output screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/console-screenshot.jpg)
 
 Before:
-Screenshot
+![Before screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/wrong-urls.png)
 
 After:
-Screensot
+![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/develop/docs/wrong-urls.png)
 
 # Install
 Using Composer;
