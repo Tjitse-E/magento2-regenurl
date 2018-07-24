@@ -208,7 +208,7 @@ class FixCategoryTreeCommand extends Command
      * @param OutputInterface $output
      * @param $descendants
      */
-    protected function renderChildTable(OutputInterface $output, $descendants): void
+    protected function renderChildTable(OutputInterface $output, $descendants)
     {
         $rows = [];
         foreach ($descendants->getItems() as $descendant) {
@@ -231,7 +231,7 @@ class FixCategoryTreeCommand extends Command
      * @param $descendants
      * @return array
      */
-    protected function getAllCategoryIds($category, $descendants): array
+    protected function getAllCategoryIds($category, $descendants)
     {
         $categoryIds = [$category->getId()];
         $categories = $descendants->getItems();
@@ -246,7 +246,7 @@ class FixCategoryTreeCommand extends Command
      * @param $categoryIds
      * @param $store
      */
-    protected function deleteUrlRewriteRecords(OutputInterface $output, $categoryIds, $store): void
+    protected function deleteUrlRewriteRecords(OutputInterface $output, $categoryIds, $store)
     {
         $connection = $this->connection->getConnection();
         $categoryIdsString = implode(', ', $categoryIds);
@@ -260,7 +260,7 @@ class FixCategoryTreeCommand extends Command
      * @param OutputInterface $output
      * @return ArrayInput
      */
-    protected function reindex(InputInterface $input, OutputInterface $output): void
+    protected function reindex(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('reindex')) {
             $output->writeln('<info>Starting reindex</info>');
@@ -285,7 +285,7 @@ class FixCategoryTreeCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    protected function cacheFlush(InputInterface $input, OutputInterface $output): void
+    protected function cacheFlush(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('flush')) {
             $output->writeln('<info>Starting cache clean</info>');
