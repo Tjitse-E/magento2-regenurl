@@ -28,27 +28,27 @@ use Magento\Store\Model\StoreManagerInterface;
 class FixCategoryTreeCommand extends Command
 {
     /**
-     * @var CategoryRepositoryInterface
+     * @var CategoryRepositoryInterface\Proxy
      */
     protected $categoryRepository;
     /**
-     * @var StoreManagerInterface
+     * @var StoreManagerInterface\Proxy
      */
     protected $storeManager;
     /**
-     * @var CollectionFactory
+     * @var CollectionFactory\Proxy
      */
     protected $categoryCollectionFactory;
     /**
-     * @var ResourceConnection
+     * @var ResourceConnection\Proxy
      */
     protected $connection;
     /**
-     * @var EventManager
+     * @var EventManager\Proxy
      */
     protected $eventManager;
     /**
-     * @var Emulation
+     * @var Emulation\Proxy
      */
     protected $emulation;
     /**
@@ -56,24 +56,24 @@ class FixCategoryTreeCommand extends Command
      */
     protected $state;
     /**
-     * @var UrlPersistInterface
+     * @var UrlPersistInterface\Proxy
      */
     protected $urlPersist;
     /**
-     * @var CategoryUrlRewriteGenerator
+     * @var CategoryUrlRewriteGenerator\Proxy
      */
     protected $categoryUrlRewriteGenerator;
 
     public function __construct(
-        CategoryUrlRewriteGenerator $categoryUrlRewriteGenerator,
-        UrlPersistInterface $urlPersist,
+        CategoryUrlRewriteGenerator\Proxy $categoryUrlRewriteGenerator,
+        UrlPersistInterface\Proxy $urlPersist,
         State $state,
-        EventManager $eventManager,
-        Emulation $emulation,
-        ResourceConnection $connection,
-        CollectionFactory $categoryCollectionFactory,
-        StoreManagerInterface $storeManager,
-        CategoryRepositoryInterface $categoryRepository
+        EventManager\Proxy $eventManager,
+        Emulation\Proxy $emulation,
+        ResourceConnection\Proxy $connection,
+        CollectionFactory\Proxy $categoryCollectionFactory,
+        StoreManagerInterface\Proxy $storeManager,
+        CategoryRepositoryInterface\Proxy $categoryRepository
     ) {
         $this->categoryRepository = $categoryRepository;
         $this->storeManager = $storeManager;
