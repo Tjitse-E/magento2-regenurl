@@ -19,17 +19,17 @@ use Magento\Framework\App\State;
 class RegenerateCategoryUrlCommand extends Command
 {
     /**
-     * @var CategoryUrlRewriteGenerator
+     * @var CategoryUrlRewriteGenerator\Proxy
      */
     protected $categoryUrlRewriteGenerator;
 
     /**
-     * @var UrlPersistInterface
+     * @var UrlPersistInterface\Proxy
      */
     protected $urlPersist;
 
     /**
-     * @var CategoryRepositoryInterface
+     * @var CategoryRepositoryInterface\Proxy
      */
     protected $collection;
 
@@ -38,30 +38,30 @@ class RegenerateCategoryUrlCommand extends Command
      */
     protected $state;
     /**
-     * @var CategoryCollectionFactory
+     * @var CategoryCollectionFactory\Proxy
      */
     private $categoryCollectionFactory;
     /**
-     * @var Emulation
+     * @var Emulation\Proxy
      */
     private $emulation;
 
     /**
      * RegenerateCategoryUrlCommand constructor.
      * @param State $state
-     * @param Collection $collection
-     * @param CategoryUrlRewriteGenerator $categoryUrlRewriteGenerator
-     * @param UrlPersistInterface $urlPersist
-     * @param CategoryCollectionFactory $categoryCollectionFactory
-     * @param Emulation $emulation
+     * @param Collection\Proxy $collection
+     * @param CategoryUrlRewriteGenerator\Proxy $categoryUrlRewriteGenerator
+     * @param UrlPersistInterface\Proxy $urlPersist
+     * @param CategoryCollectionFactory\Proxy $categoryCollectionFactory
+     * @param Emulation\Proxy $emulation
      */
     public function __construct(
         State $state,
-        Collection $collection,
-        CategoryUrlRewriteGenerator $categoryUrlRewriteGenerator,
-        UrlPersistInterface $urlPersist,
-        CategoryCollectionFactory $categoryCollectionFactory,
-        Emulation $emulation
+        Collection\Proxy $collection,
+        CategoryUrlRewriteGenerator\Proxy $categoryUrlRewriteGenerator,
+        UrlPersistInterface\Proxy $urlPersist,
+        CategoryCollectionFactory\Proxy $categoryCollectionFactory,
+        Emulation\Proxy $emulation
     ) {
         $this->state = $state;
         $this->collection = $collection;
