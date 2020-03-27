@@ -92,7 +92,7 @@ class RegenerateCategoryUrlCommand extends Command
         return parent::configure();
     }
 
-    public function execute(InputInterface $inp, OutputInterface $out)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         try{
             $this->state->getAreaCode();
@@ -100,14 +100,14 @@ class RegenerateCategoryUrlCommand extends Command
             $this->state->setAreaCode('adminhtml');
         }
 
-        $store_id = $inp->getOption('store');
+        $store_id = $input->getOption('store');
         $this->emulation->startEnvironmentEmulation($store_id, Area::AREA_FRONTEND, true);
 
         $categories = $this->categoryCollectionFactory->create()
             ->setStore($store_id)
             ->addAttributeToSelect(['name', 'url_path', 'url_key']);
 
-        $cids = $inp->getArgument('cids');
+        $cids = $input->getArgument('cids');
         if( !empty($cids) ) {
             $categories->addAttributeToFilter('entity_id', ['in' => $cids]);
         }
@@ -115,7 +115,7 @@ class RegenerateCategoryUrlCommand extends Command
         $regenerated = 0;
         foreach($categories as $category)
         {
-            $out->writeln('Regenerating urls for ' . $category->getName() . ' (' . $category->getId() . ')');
+            $output->writeln('Regenerating urls for ' . $category->getName() . ' (' . $category->getId() . ')');
 
             $this->urlPersist->deleteByData([
                 UrlRewrite::ENTITY_ID => $category->getId(),
@@ -130,10 +130,10 @@ class RegenerateCategoryUrlCommand extends Command
                 $regenerated += count($newUrls);
             }
             catch(\Exception $e) {
-                $out->writeln(sprintf('<error>Duplicated url for store ID %d, category %d (%s) - %s Generated URLs:' . PHP_EOL . '%s</error>' . PHP_EOL, $store_id, $category->getId(), $category->getName(), $e->getMessage(), implode(PHP_EOL, array_keys($newUrls))));
+                $output->writeln(sprintf('<error>Duplicated url for store ID %d, category %d (%s) - %s Generated URLs:' . PHP_EOL . '%s</error>' . PHP_EOL, $store_id, $category->getId(), $category->getName(), $e->getMessage(), implode(PHP_EOL, array_keys($newUrls))));
             }
         }
         $this->emulation->stopEnvironmentEmulation();
-        $out->writeln('Done regenerating. Regenerated ' . $regenerated . ' urls');
+        $output->writeln('Done regenerating. Regenerated ' . $regenerated . ' urls');
     }
 }

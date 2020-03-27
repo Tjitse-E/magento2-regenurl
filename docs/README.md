@@ -46,6 +46,12 @@ After:
 
 ![After screenshot](https://github.com/Tjitse-E/magento2-regenurl/blob/master/docs/fixed-urls2.png)
 
+### Regeneration product urls
+```
+php bin/magento regenerate:product:url -s 1 --only-visible=1
+```
+The `only-visible` flag is optional, it will regenerate the product urls only for products that are visible (n.b. no 'Not visible individually'). See [#3](https://github.com/Tjitse-E/magento2-regenurl/issues/3).
+
 # Install
 Using Composer;
 

@@ -104,7 +104,7 @@ class RegenerateCategoryPathCommand extends Command
         return parent::configure();
     }
 
-    public function execute(InputInterface $inp, OutputInterface $out)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         try{
             $this->state->getAreaCode();
@@ -112,13 +112,13 @@ class RegenerateCategoryPathCommand extends Command
             $this->state->setAreaCode('adminhtml');
         }
 
-        $store_id = $inp->getOption('store');
+        $store_id = $input->getOption('store');
 
         $categories = $this->categoryCollectionFactory->create()
             ->setStore($store_id)
             ->addAttributeToSelect(['name', 'url_path', 'url_key']);
 
-        $cids = $inp->getArgument('cids');
+        $cids = $input->getArgument('cids');
         if( !empty($cids) ) {
             $categories->addAttributeToFilter('entity_id', ['in' => $cids]);
         }
@@ -126,7 +126,7 @@ class RegenerateCategoryPathCommand extends Command
         $regenerated = 0;
         foreach($categories as $category)
         {
-            $out->writeln('Regenerating urls for ' . $category->getName() . ' (' . $category->getId() . ')');
+            $output->writeln('Regenerating urls for ' . $category->getName() . ' (' . $category->getId() . ')');
 
             $category->setOrigData('url_key', mt_rand(0,1000)); // set url_key in orig data to random value to force regeneration of path
             $category->setOrigData('url_path', mt_rand(0,1000)); // set url_path in orig data to random value to force regeneration of path for children
@@ -139,6 +139,6 @@ class RegenerateCategoryPathCommand extends Command
             $regenerated++;
         }
 
-        $out->writeln('Done regenerating. Regenerated url paths for ' . $regenerated . ' categories');
+        $output->writeln('Done regenerating. Regenerated url paths for ' . $regenerated . ' categories');
     }
 }
