@@ -2,6 +2,7 @@
 
 namespace Iazel\RegenProductUrl\Console\Command;
 
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
@@ -94,26 +95,28 @@ class RegenerateProductUrlCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $errors = [];
+
         try {
             $this->state->getAreaCode();
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->state->setAreaCode('adminhtml');
         }
 
-        $store_id = $input->getOption('store');
+        $storeId = $input->getOption('store');
         $stores = $this->storeManager->getStores(false);
 
-        if (!is_numeric($store_id)) {
-            $store_id = $this->getStoreIdByCode($store_id, $stores);
+        if (!is_numeric($storeId)) {
+            $storeId = $this->getStoreIdByCode($storeId, $stores);
         }
 
         foreach ($stores as $store) {
             // If store has been given through option, skip other stores
-            if ($store_id != Store::DEFAULT_STORE_ID and $store->getId() != $store_id) {
+            if ($storeId != Store::DEFAULT_STORE_ID and $store->getId() != $storeId) {
                 continue;
             }
 
-            $this->collection->addStoreFilter($store_id)->setStoreId($store_id);
+            $this->collection->addStoreFilter($storeId)->setStoreId($storeId);
 
             // Visibility filter
             if ((bool)$input->getOption('only-visible')) {
@@ -138,21 +141,23 @@ class RegenerateProductUrlCommand extends Command
             $this->collection->addAttributeToSelect(['url_path', 'url_key']);
 
             $count = $this->collection->count();
-            $output->writeln("<info>{$count} products found for store {$store_id}. Start regeneration.</info>");
+            $output->writeln("<info>{$count} products found for store {$storeId}. Start regeneration.</info>");
 
             $list = $this->collection->load();
             $regenerated = 0;
+
+            /** @var ProductInterface $product */
             foreach ($list as $product) {
                 echo 'Regenerating urls for ' . $product->getSku() . ' (' . $product->getId(
                     ) . ') in store ' . $store->getName() . PHP_EOL;
-                $product->setStoreId($store_id);
+                $product->setStoreId($storeId);
 
                 $this->urlPersist->deleteByData(
                     [
                         UrlRewrite::ENTITY_ID => $product->getId(),
                         UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
                         UrlRewrite::REDIRECT_TYPE => 0,
-                        UrlRewrite::STORE_ID => $store_id
+                        UrlRewrite::STORE_ID => $storeId
                     ]
                 );
 
@@ -161,19 +166,33 @@ class RegenerateProductUrlCommand extends Command
                     $this->urlPersist->replace($newUrls);
                     $regenerated += count($newUrls);
                 } catch (\Exception $e) {
+                    $errors[] = [
+                        'store_id' => $storeId,
+                        'product_id' => $product->getId(),
+                        'product_sku' => $product->getSku(),
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+            $output->writeln('Done regenerating. Regenerated ' . $regenerated . ' urls for store ' . $store->getName());
+
+            $errorCount = count($errors);
+            if ($errorCount >= 1) {
+                $output->writeln(
+                    sprintf('<error>Could not regenerate the urls for these %s products:</error>', $errorCount)
+                );
+                foreach ($errors as $error) {
                     $output->writeln(
                         sprintf(
-                            '<error>Duplicated url for store ID %d, product %d (%s) - %s Generated URLs:' . PHP_EOL . '%s</error>' . PHP_EOL,
-                            $store_id,
-                            $product->getId(),
-                            $product->getSku(),
-                            $e->getMessage(),
-                            implode(PHP_EOL, array_keys($newUrls))
+                            '<error>Store ID %s, Product ID %s (%s). Error: %s</error>',
+                            $error['store_id'],
+                            $error['product_id'],
+                            $error['product_sku'],
+                            $error['error']
                         )
                     );
                 }
             }
-            $output->writeln('Done regenerating. Regenerated ' . $regenerated . ' urls for store ' . $store->getName());
         }
     }
 
