@@ -87,7 +87,7 @@ class FixCategoryTreeCommand extends Command
         $this->categoryUrlRewriteGenerator = $categoryUrlRewriteGenerator;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('regenerate:category:tree')
             ->setDescription('Regenerate the category tree for a given category tree')
@@ -117,17 +117,17 @@ class FixCategoryTreeCommand extends Command
                 'Cache flush after completion?',
                 false
             );
-        return parent::configure();
+        parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         // Get and check input
         $categoryId = $input->getOption('category');
         $storeId = $input->getOption('store');
         if (empty($categoryId) || empty($storeId)) {
             $output->writeln("<error>Category ID or Store ID missing</error>");
-            return;
+            return 1;
         }
 
         // Get categorie and store
@@ -135,13 +135,13 @@ class FixCategoryTreeCommand extends Command
             $category = $this->categoryRepository->get($categoryId);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
             $output->writeln("<error>Category: {$exception->getMessage()}</error>");
-            return;
+            return 1;
         }
         try {
             $store = $this->storeManager->getStore($storeId);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
             $output->writeln("<error>Store: {$exception->getMessage()}</error>");
-            return;
+            return 1;
         }
 
         // Start fixing tree
@@ -151,7 +151,7 @@ class FixCategoryTreeCommand extends Command
         $descendants = $this->getDescendants($category, $storeId);
         if (!$descendants) {
             $output->writeln("<error>No descendants found for {$category->getName()}</error>");
-            return;
+            return 1;
         }
 
         // Debugging, render child category tables
@@ -179,6 +179,7 @@ class FixCategoryTreeCommand extends Command
         $this->cacheFlush($input, $output);
 
         $output->writeln('<info>Finshed!</info>');
+        return 0;
     }
 
     /**

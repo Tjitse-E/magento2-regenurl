@@ -67,7 +67,7 @@ class RegenerateProductUrlCommand extends Command
         $this->storeManager = $storeManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('regenerate:product:url')
             ->setDescription('Regenerate url for given products')
@@ -90,10 +90,10 @@ class RegenerateProductUrlCommand extends Command
                 'Only generate urls for products that are visible',
                 false
             );
-        return parent::configure();
+        parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $errors = [];
 
@@ -194,6 +194,7 @@ class RegenerateProductUrlCommand extends Command
                 }
             }
         }
+        return 0;
     }
 
     private function getStoreIdByCode($store_id, $stores)

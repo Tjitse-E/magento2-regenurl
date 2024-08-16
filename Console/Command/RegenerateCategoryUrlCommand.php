@@ -73,7 +73,7 @@ class RegenerateCategoryUrlCommand extends Command
         $this->emulation = $emulation;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('regenerate:category:url')
             ->setDescription('Regenerate url for given categories')
@@ -89,10 +89,10 @@ class RegenerateCategoryUrlCommand extends Command
                 Store::DEFAULT_STORE_ID
             )
         ;
-        return parent::configure();
+        parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         try{
             $this->state->getAreaCode();
@@ -135,5 +135,6 @@ class RegenerateCategoryUrlCommand extends Command
         }
         $this->emulation->stopEnvironmentEmulation();
         $output->writeln('Done regenerating. Regenerated ' . $regenerated . ' urls');
+        return 0;
     }
 }
